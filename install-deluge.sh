@@ -36,11 +36,11 @@ nocert="--no-check-certificate"
 	# Creating Service
 	if [ "$init" == 'systemd' ]; then
 	rm /etc/systemd/system/deluge.service
-	wget $nocert "https://raw.githubusercontent.com/sayem314/My-Deluge-Installer/master/etc/deluge.service" -O "/etc/systemd/system/deluge.service"
+	wget -q $nocert "https://raw.githubusercontent.com/sayem314/My-Deluge-Installer/master/etc/deluge.service" -O "/etc/systemd/system/deluge.service" &>/dev/null
 	systemctl enable deluge
 	elif [ "$init" == 'init' ]; then
 	rm /etc/init/deluge.conf
-	wget $nocert "https://raw.githubusercontent.com/sayem314/My-Deluge-Installer/master/etc/deluge.conf" -O "/etc/init/deluge.conf"
+	wget -q $nocert "https://raw.githubusercontent.com/sayem314/My-Deluge-Installer/master/etc/deluge.conf" -O "/etc/init/deluge.conf" &>/dev/null
 	fi
 	service deluge start
 	echo ""
