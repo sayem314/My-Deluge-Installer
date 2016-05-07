@@ -1,7 +1,6 @@
 #!/bin/bash
 #
 # My Deluge Installer
-# v1.0
 #
 
 #Global Config
@@ -29,22 +28,23 @@ nocert="--no-check-certificate"
 	fi
 
 	echo ""
-	echo "  Installing deluge"
+	echo "Installing deluge"
 	apt-get update -qy &>/dev/null && apt-get install deluged deluge-webui -qy &>/dev/null
-	echo "  Deluge Installed"
+	echo "Deluge Installed"
 	
 	# Creating Service
 	if [ "$init" == 'systemd' ]; then
-	rm /etc/systemd/system/deluge.service
+	rm /etc/systemd/system/deluge.service &>/dev/null
 	wget -q $nocert "https://raw.githubusercontent.com/sayem314/My-Deluge-Installer/master/etc/deluge.service" -O "/etc/systemd/system/deluge.service" &>/dev/null
 	systemctl enable deluge
 	elif [ "$init" == 'init' ]; then
-	rm /etc/init/deluge.conf
+	rm /etc/init/deluge.conf &>/dev/null
 	wget -q $nocert "https://raw.githubusercontent.com/sayem314/My-Deluge-Installer/master/etc/deluge.conf" -O "/etc/init/deluge.conf" &>/dev/null
 	fi
+	echo ""
 	service deluge start
 	echo ""
-	echo "  Access deluge at $(tput setaf 3)http://$ip:8112$(tput sgr0)"
-	echo "  Default deluge password is $(tput setaf 3)deluge$(tput sgr0)"
+	echo "Access deluge at $(tput setaf 3)http://$ip:8112$(tput sgr0)"
+	echo "Default deluge password is $(tput setaf 3)deluge$(tput sgr0)"
 	echo ""
 	exit
