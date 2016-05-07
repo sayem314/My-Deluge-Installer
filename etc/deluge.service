@@ -5,8 +5,8 @@ After=network-online.target
 [Service]
 Type=simple
 
-User=$user
-Group=$user
+User=root
+Group=root
 UMask=027
 
 ExecStart=/usr/bin/deluge-web
