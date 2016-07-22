@@ -71,7 +71,8 @@ uninstalldeluge () {
 	fi
 	echo ""
 	echo "  Uninstalling deluge"
-	apt-get purge deluged deluge-webui -qy &>/dev/null
+	dpkg --configure -a &>/dev/null
+	apt-get remove --purge deluged deluge-webui -y &>/dev/null
 	apt-get autoremove &>/dev/null
 	apt-get autoclean &>/dev/null
 	echo "  Deluge Uninstalled"
