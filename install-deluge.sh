@@ -9,7 +9,7 @@ ip=`wget -qO- ipv4.icanhazip.com`
 user=`whoami`
 nocert="--no-check-certificate"
 
-amiroot () {
+error () {
 	echo ""
 	echo "  use -install or -del"
 	echo ""
