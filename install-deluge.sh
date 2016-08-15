@@ -9,7 +9,7 @@ ip=`wget -qO- ipv4.icanhazip.com`
 user=`whoami`
 nocert="--no-check-certificate"
 
-error () {
+howto () {
 	echo ""
 	echo "  use -install or -del"
 	echo ""
@@ -84,10 +84,10 @@ uninstalldeluge () {
 # See how we were called.
 case $1 in
 	'-install'|'install' )
-		amiroot; installdeluge;;
+	amiroot; installdeluge;;
 	'-del'|'delete'|'-rm'|'-uninstall'|'uninstall' )
-		amiroot; uninstalldeluge;;
+	amiroot; uninstalldeluge;;
 	*)
-		error;;
+	howto;;
 esac
 exit 1
