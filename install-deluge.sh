@@ -38,8 +38,7 @@ installdeluge () {
 
 	echo ""
 	echo "  Installing deluge"
-	dpkg --configure -a &>/dev/null
-	apt-get update -qy &>/dev/null && apt-get install deluged deluge-webui -qy &>/dev/null
+	apt-get update -y &>/dev/null && apt-get install deluged deluge-webui -y &>/dev/null
 	echo "  Deluge Installed"
 	
 	# Creating Service
@@ -72,10 +71,9 @@ uninstalldeluge () {
 	fi
 	echo ""
 	echo "  Uninstalling deluge"
-	dpkg --configure -a &>/dev/null
 	apt-get remove --purge deluged deluge-webui -y &>/dev/null
-	apt-get autoremove &>/dev/null
-	apt-get autoclean &>/dev/null
+	apt-get autoremove -y &>/dev/null
+	apt-get autoclean -y &>/dev/null
 	echo "  Deluge Uninstalled"
 	echo ""
 	exit
