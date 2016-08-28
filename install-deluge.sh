@@ -15,8 +15,9 @@ howto () {
 	echo ""
 }
 
-amiroot () {
-	if [[ "$EUID" -ne 0 ]]; then
+chksudo () {
+	timeout 2 sudo id &>/dev/null && permission="true" || permission="no"
+	if [[ "$permission" == "no" ]]; then
 		echo ""
 		echo "  Sorry, you need to run this as root"
 		exit
@@ -37,37 +38,79 @@ installdeluge () {
 	fi
 
 	echo ""
-	echo "  Installing deluge"
-	apt-get update -y &>/dev/null && apt-get install deluged deluge-webui -y &>/dev/null
-	echo "  Deluge Installed"
+	echo -n "  Installing deluge"
+	apt-get install python-software-properties -y &>/dev/null
+	yes ENTER | add-apt-repository ppa:deluge-team/ppa &>/dev/null
+	apt-get update -y &>/dev/null
+	apt-get install deluged deluge-webui -y &>/dev/null
+	echo "  $(tput setaf 2)DONE$(tput sgr0)"
 	
-	# Creating Service
-	if [ "$init" == 'systemd' ]; then
-	rm /etc/systemd/system/deluge.service
-	wget $nocert "https://raw.githubusercontent.com/sayem314/My-Deluge-Installer/master/etc/deluge.service" -O "/etc/systemd/system/deluge.service"
-	systemctl enable deluge
-	elif [ "$init" == 'init' ]; then
-	rm /etc/init/deluge.conf
-	wget $nocert "https://raw.githubusercontent.com/sayem314/My-Deluge-Installer/master/etc/deluge.conf" -O "/etc/init/deluge.conf"
-	fi
-	service deluge start
+	# Starting Service
+	deluged
+	deluge-web --fork
 	echo ""
 	echo "  Access deluge at $(tput setaf 3)http://$ip:8112$(tput sgr0)"
 	echo "  Default deluge password is $(tput setaf 3)deluge$(tput sgr0)"
 	echo ""
-	exit
+
+}
+
+makeservice () {
+	echo "  Not implented yet"
+	exit;
+	echo -n "  Creating service..."
+	if [ "$init" == 'systemd' ]; then
+		rm -f /etc/systemd/system/deluge.service
+		cat <<EOF > /etc/systemd/system/deluge.service
+[Unit]
+Description=Deluge Bittorrent Client Web Interface
+After=network-online.target
+
+[Service]
+Type=simple
+User=$user
+Group=$user
+UMask=027
+ExecStart=/usr/bin/deluge-web
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF
+		chmod 0644 /etc/systemd/system/deluge.service
+		echo "  $(tput setaf 2)DONE$(tput sgr0)"
+		systemctl enable deluge
+	elif [[ "$init" == 'init' ]]; then
+		rm -f /etc/init/deluge.conf
+		cat <<EOF > /etc/init/deluge.conf
+start on started deluge
+stop on stopping deluge
+
+env uid=$user
+env gid=$user
+env umask=027
+
+exec start-stop-daemon -S -c $uid:$gid -k $umask -x /usr/bin/deluge-web
+EOF
+		echo "  $(tput setaf 2)DONE$(tput sgr0)"
+	else
+		echo "  $(tput setaf 1)FAILED$(tput sgr0)"
+
+	fi
 }
 
 uninstalldeluge () {
 	# Deleting Service
 	echo ""
 	echo "  Stopping deluge process"
-	service deluge stop
+	service deluged stop
+	killall deluged
+	killall deluge-web
 	if [ "$init" == 'systemd' ]; then
 	systemctl disable deluge
-	rm /etc/systemd/system/deluge.service
+	rm -f /etc/systemd/system/deluge.service
 	elif [ "$init" == 'init' ]; then
-	rm /etc/init/deluge.conf
+	rm -f /etc/init/deluge.conf
 	fi
 	echo ""
 	echo "  Uninstalling deluge"
@@ -82,9 +125,9 @@ uninstalldeluge () {
 # See how we were called.
 case $1 in
 	'-install'|'install' )
-	amiroot; installdeluge;;
+	chksudo; installdeluge;;
 	'-del'|'delete'|'-rm'|'-uninstall'|'uninstall' )
-	amiroot; uninstalldeluge;;
+	chksudo; uninstalldeluge;;
 	*)
 	howto;;
 esac
