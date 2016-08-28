@@ -16,10 +16,10 @@ howto () {
 }
 
 chksudo () {
-	timeout 2 sudo id &>/dev/null && permission="true" || permission="no"
-	if [[ "$permission" == "no" ]]; then
+	if [[ "$EUID" -ne 0 ]]; then
 		echo ""
 		echo "  Sorry, you need to run this as root"
+		echo ""
 		exit
 	fi
 }
