@@ -39,7 +39,7 @@ installdeluge () {
 
 	echo ""
 	echo -n " Installing python-software-properties..."
-	apt-get install python-software-properties -y &>/dev/null
+	apt-get install python-software-properties -y &>/dev/null || apt-get install software-properties-common -y &>/dev/null
 	echo "  $(tput setaf 2)DONE$(tput sgr0)"
 	echo -n " Addning repository ppa:deluge-team/ppa..."
 	yes ENTER | add-apt-repository ppa:deluge-team/ppa &>/dev/null
